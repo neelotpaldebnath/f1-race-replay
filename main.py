@@ -1,7 +1,45 @@
+from argparse import ArgumentParser
 from src.f1_data import get_race_telemetry, load_race_session, enable_cache, get_circuit_rotation
 from src.arcade_replay import run_arcade_replay
-import sys
 
+
+def parse_args():
+    parser = ArgumentParser(
+        description="F1 Race Replay - telemetry-driven race visualization"
+    )
+
+    parser.add_argument(
+        "--year",
+        type=int,
+        default=2025,
+        help="F1 season year"
+    )
+
+    parser.add_argument(
+        "--round",
+        type=int,
+        default=12,
+        help="F1 championship round"
+    )
+
+    parser.add_argument(
+        "--session",
+        choices=["R", "S"],
+        default="R",
+        help="Session type: R for Race, S for Sprint"
+    )
+
+    parser.add_argument(
+        "--speed",
+        type=float,
+        choices=[0.5, 1.0, 2.0, 4.0],
+        default=1.0,
+        help="Initial replay playback speed"
+    )
+
+    return parser.parse_args()
+  
+  
 def main(year=None, round_number=None, playback_speed=1, session_type='R'):
   session = load_race_session(year, round_number, session_type)
   print(f"Loaded session: {session.event['EventName']} - {session.event['RoundNumber']}")
@@ -31,7 +69,7 @@ def main(year=None, round_number=None, playback_speed=1, session_type='R'):
       track_statuses=race_telemetry['track_statuses'],
       example_lap=example_lap,
       drivers=drivers,
-      playback_speed=1.0,
+      playback_speed=playback_speed,
       driver_colors=race_telemetry['driver_colors'],
       title=f"{session.event['EventName']} - {'Sprint' if session_type == 'S' else 'Race'}",
       total_laps=race_telemetry['total_laps'],
@@ -43,24 +81,11 @@ def main(year=None, round_number=None, playback_speed=1, session_type='R'):
     traceback.print_exc()
 
 if __name__ == "__main__":
+    args = parse_args()
 
-  # Get the year and round number from user input
-
-  if "--year" in sys.argv:
-    year_index = sys.argv.index("--year") + 1
-    year = int(sys.argv[year_index])
-  else:
-    year = 2025  # Default year
-
-  if "--round" in sys.argv:
-    round_index = sys.argv.index("--round") + 1
-    round_number = int(sys.argv[round_index])
-  else:
-    round_number = 12  # Default round number
-
-  playback_speed = 1
-
-# Session type selection
-  session_type = 'S' if "--sprint" in sys.argv else 'R'
-  
-  main(year, round_number, playback_speed, session_type=session_type)
+    main(
+        year=args.year,
+        round_number=args.round,
+        playback_speed=args.speed,
+        session_type=args.session
+    )
