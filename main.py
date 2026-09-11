@@ -3,6 +3,17 @@ from src.f1_data import get_race_telemetry, load_race_session, enable_cache, get
 from src.arcade_replay import run_arcade_replay
 
 
+def validate_config(year, round_number, speed):
+    if year < 2018:
+        raise ValueError("Year must be 2018 or later.")
+
+    if round_number < 1 or round_number > 30:
+        raise ValueError("Round must be between 1 and 30.")
+
+    if speed <= 0:
+        raise ValueError("Playback speed must be greater than 0.")
+
+
 def parse_args():
     parser = ArgumentParser(
         description="F1 Race Replay - telemetry-driven race visualization"
@@ -82,6 +93,7 @@ def main(year=None, round_number=None, playback_speed=1, session_type='R'):
 
 if __name__ == "__main__":
     args = parse_args()
+    validate_config(args.year, args.round, args.speed)
 
     main(
         year=args.year,
