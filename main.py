@@ -52,6 +52,7 @@ def parse_args():
   
   
 def main(year=None, round_number=None, playback_speed=1, session_type='R'):
+  session_name = "Sprint" if session_type == "S" else "Race"  
   session = load_race_session(year, round_number, session_type)
   print(f"Loaded session: {session.event['EventName']} - {session.event['RoundNumber']}")
 
